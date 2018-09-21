@@ -31,20 +31,24 @@ uint32_t getID(uint64_t RAW){
 
 void setup() {
   pinMode(D1, INPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D3, OUTPUT);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, LOW);
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, HIGH);
 //  pinMode(D2, INPUT);
   WiFi.forceSleepBegin();
 //  ESP.wdtDisable();
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(10);
   Serial.println();
 }
 
 void loop() {
-  for (;;) {
-    if (!counter) yield();
-    counter++;
+//  for (;;) {
+//    if (!counter) yield();
+//    counter++;
     state = GPI&0b00100000;
     
    if (state!=ostate){
@@ -91,13 +95,14 @@ void loop() {
           !(__builtin_popcountll(data&0x8421084210842) % 2)
           ){
             digitalWrite(BUILTIN_LED, LOW);
-            Serial.printf("RAW: %08X%08X Ven: %03u UID: ", first_data, second_data, getVendor(data));
+            Serial.printf("[%05d] RAW: %08X%08X Ven: %03u UID: ", millis(), first_data, second_data, getVendor(data));
             uint32_t uid = getID(data);
             char buffer[100];
             sprintf(buffer, "%04ld", uid/1000000L);
             Serial.print(buffer); 
             sprintf(buffer, "%05ld", uid%1000000L);
-            Serial.println(buffer);
+            Serial.print(buffer);
+            Serial.print("\r\n");
           }
       }
 
@@ -105,6 +110,6 @@ void loop() {
       ostate=state;
       tock=tick;
     }
-  }
+//  }
 //  Serial.printf("%d,%d\r\n", digitalRead(D1), digitalRead(D2));
 }
